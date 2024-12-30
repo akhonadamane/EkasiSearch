@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekasi Makethe - Product Search By Voice</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        #productTable {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #productTable th, #productTable td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        #productTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #productTable td {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ekasi Makethe - Product Search By Voice</h1>
+        <div class="form-container">
+            <button id="voiceSearchBtn">🎙️ Search for the product to buy</button>
+        </div>
+        <div id="productResults" style="display: none;">
+            <h2>Product Results</h2>
+            <table id="productTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Condition</th>
+                    </tr>
+                </thead>
+                <tbody id="productList"></tbody>
+            </table>
+            <p id="noProductMessage" style="display: none;">Product not available now. The sellers will be notified of your desired product item.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const voiceSearchBtn = document.getElementById('voiceSearchBtn');
+            const productResults = document.getElementById('productResults');
+            const productTable = document.getElementById('productTable');
+            const productList = document.getElementById('productList');
+            const noProductMessage = document.getElementById('noProductMessage');
+
+            // Product list with recognized products
+            const availableProducts = {
+                "phone new": "New Phone",
+                "phone second hand": "Second Hand Phone",
+                "umbhaco": "Umbhaco",
+                "set of ear rings": "Set of Ear Rings",
+                "maize meal": "Maize Meal",
+                "rice": "Rice",
+                "bread": "Bread",
+                "cooking oil": "Cooking Oil",
+                "sugar": "Sugar",
+                "tea": "Tea",
+                "coffee": "Coffee",
+                "1 litre milk": "1 Litre Milk",
+                "2 litre milk": "2 Litre Milk",
+                "apples": "Apples",
+                "oranges": "Oranges",
+                "bananas": "Bananas",
+                "mangoes": "Mangoes",
+                "pineapples": "Pineapples",
+                "tomatoes": "Tomatoes",
+                "onion": "Onion",
+                "carrots": "Carrots",
+                "spinach": "Spinach",
+                "cabbage": "Cabbage",
+                "meat": "Meat",
+                "poultry": "Poultry"
+            };
+
+            // Start voice search
+            voiceSearchBtn.addEventListener('click', () => {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    alert('Your browser does not support Speech Recognition');
+                    return;
+                }
+
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+
+                recognition.start();
+                voiceSearchBtn.textContent = '🎙️ Listening...';
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    voiceSearchBtn.textContent = '🎙️ Search for the product to buy'; // Reset button
+                    processSearch(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    alert('Voice Input Error: ' + event.error);
+                    voiceSearchBtn.textContent = '🎙️ Search for the product to buy'; // Reset button
+                };
+            });
+
+            // Process the product search based on the transcript
+            function processSearch(query) {
+                const productName = availableProducts[query];
+
+                productResults.style.display = 'block';
+                productTable.style.display = 'none';
+                noProductMessage.style.display = 'none';
+
+                if (productName) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${productName}</td><td>${query.includes('new') || query.includes('second hand') ? 'Available' : 'Not Available'}</td>`;
+                    productList.innerHTML = '';
+                    productList.appendChild(row);
+                    productTable.style.display = 'table';
+                } else {
+                    noProductMessage.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
